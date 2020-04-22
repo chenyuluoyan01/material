@@ -4,57 +4,91 @@
             <div slot="header">
                 <span>新增品牌</span>
             </div>
-            <v-form></v-form>
+            <v-form @addData="addData"></v-form>
         </el-card>
 
         <el-card class="table-card">
             <div slot="header" style="margin:-18px -20px; padding:18px 20px; background: #1296db;color:#fff">
                 <span>品牌详情</span>
             </div>
-            <el-table :data="classifyData" highlight-current-row border :row-class-name="tableRowClassName" :header-cell-style="headClass">
+            <el-table :data="brandData" highlight-current-row border :row-class-name="tableRowClassName" :header-cell-style="headClass">
                 <el-table-column
                     type="index"
                     label="编号"
+                    fixed
                     width="80">
                 </el-table-column>
                 <el-table-column
                     label="第一分类/专业"
-                    width="200">
-                    <template slot-scope="scope">{{scope.row.company}}</template>
+                    width="120">
+                    <template slot-scope="scope">
+                        {{JSON.stringify(scope.row.material.parent) == '{}'?'--': 
+                        (scope.row.material.parent.parent_type_info == undefined || scope.row.material.parent.parent_type_info.length == 0)? '--' : 
+                        scope.row.material.parent.parent_type_info[0] == undefined?'--' : 
+                        scope.row.material.parent.parent_type_info[0].type_name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
                     label="第二分类/类型"
                     width="120">
-                    <template slot-scope="scope">{{scope.row.legal_person}}</template>
+                    <template slot-scope="scope">
+                        {{JSON.stringify(scope.row.material.parent) == '{}'?'--': 
+                        (scope.row.material.parent.parent_type_info == undefined || scope.row.material.parent.parent_type_info.length == 0)? '--' : 
+                        scope.row.material.parent.parent_type_info[1] == undefined?'--' : 
+                        scope.row.material.parent.parent_type_info[1].type_name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
                     label="第三分类/类别"
-                    width="150">
-                    <template slot-scope="scope">{{scope.row.telephone}}</template>
+                    width="120">
+                    <template slot-scope="scope">
+                        {{JSON.stringify(scope.row.material.parent) == '{}'?'--': 
+                        (scope.row.material.parent.parent_type_info == undefined || scope.row.material.parent.parent_type_info.length == 0)? '--' : 
+                        scope.row.material.parent.parent_type_info[2] == undefined?'--' : 
+                        scope.row.material.parent.parent_type_info[2].type_name}}
+                    </template>
                 </el-table-column>
                 <el-table-column
-                    label="第四分类/材料"
-                    width="300">
-                    <template slot-scope="scope">{{scope.row.address}}</template>
+                    label="材料名称"
+                    width="190">
+                    <template slot-scope="scope">{{scope.row.material.name}}</template>
                 </el-table-column>
                 <el-table-column
-                    label="统一信用代码"
-                    width="180">
-                    <template slot-scope="scope">{{scope.row.uscc}}</template>
+                    label="规格"
+                    width="130">
+                    <template slot-scope="scope">{{scope.row.material.specifications}}</template>
+                </el-table-column>
+                <el-table-column
+                    label="单位"
+                    width="100">
+                    <template slot-scope="scope">{{scope.row.material.unit}}</template>
+                </el-table-column>
+                <el-table-column
+                    label="品牌名称"
+                    width="170">
+                    <template slot-scope="scope">{{scope.row.name}}</template>
+                </el-table-column>
+                <el-table-column
+                    label="供应商"
+                    width="120">
+                    <template slot-scope="scope">{{scope.row.suppliers_id}}</template>
                 </el-table-column>
                 <el-table-column
                     label="编辑"
+                    fixed="right"
                     width="120">
                     <template slot-scope="scope">
-                        <span class="edit-icon icon1" @click="edit(scope.row)"><i class="iconfont iconxiugai"></i></span>
-                        <span class="edit-icon icon0" @click="del(scope.row.id)"><i class="iconfont iconshanchu"></i></span>
+                        <!-- <span class="edit-icon icon1" @click="edit(scope.row)"><i class="iconfont iconxiugai"></i></span> -->
+                        <el-popconfirm :title="'确定删除 '+scope.row.name+' 吗？'" @onConfirm="del(scope.row.id)">
+                            <span class="edit-icon icon0" slot="reference"><i class="iconfont iconshanchu"></i></span>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
             <div class="pages">
                 <el-pagination
                 background
-                layout="sizes, prev, pager, next"
+                layout="total, sizes, prev, pager, next, jumper"
                 @current-change="handleCurrentChange"
                 @size-change = "handleSizeChange"
                 :current-page="currentPage"
@@ -64,15 +98,6 @@
                 </el-pagination>
             </div>
         </el-card>
-
-        <!-- 点击修改 -->
-        <el-dialog title="修改品牌" :visible.sync="dialogFormVisible" :fullscreen="false" :append-to-body="true">
-            <v-form></v-form>
-            <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="modifyPwd">确 定</el-button>
-            </div>
-        </el-dialog>
     </div>
 </template>
 
@@ -84,43 +109,20 @@ export default {
     },
     data() {
         return {
-            dialogFormVisible: false,
             currentPage: 1,
             pageSize: 20,
             total: 5,
-            classifyData: [
-                {
-                    "address": " 浙江杭州",
-                    "company": "阿里巴巴",
-                    "create_time": "2020-04-16 14:42:17",
-                    "id": 1,
-                    "is_delete": false,
-                    "legal_person": " 马云",
-                    "status": 1,
-                    "telephone": "1781893500",
-                    "update_time": "2020-04-16 14:42:17",
-                    "uscc": "91330100716105852F"
-                },
-                {
-                    "address": "广东深圳",
-                    "company": "腾讯",
-                    "create_time": "2020-04-16 14:43:17",
-                    "id": 3,
-                    "is_delete": false,
-                    "legal_person": " 马化腾",
-                    "status": 0,
-                    "telephone": "17818935006",
-                    "update_time": "2020-04-16 15:57:43",
-                    "uscc": "91330100716105852F"
-                },
-            ]
+            brandData: []
         }
+    },
+    mounted() {
+        this.getAllBrands()
     },
     methods: {
         tableRowClassName({row, rowIndex}) {
-            if (rowIndex === 1) {
+            if (rowIndex%4 === 1) {
                 return 'warning-row';
-            } else if (rowIndex === 3) {
+            } else if (rowIndex%4 === 3) {
                 return 'success-row';
             }
             return '';
@@ -131,27 +133,44 @@ export default {
         // 分页功能
         handleSizeChange(val){
             this.pageSize = val
-            this.get_classify_data()
+            this.getAllBrands()
         },
         handleCurrentChange(val){
-            console.log(val)
             this.currentPage = val
-            this.get_classify_data()
+            this.getAllBrands()
         },
         // 获取供应商列表数据
-        get_classify_data() {
-
+        getAllBrands() {
+            let params = {
+                now_page: this.currentPage,
+                page_size: this.pageSize
+            }
+            this.get('useradmin/select_all_brands/', params).then((res) => {
+                if(res.code == 0) {
+                    this.brandData = res.data.brands
+                    this.total = parseInt(res.data.pagination.max_count)
+                }
+            })
         },
-        edit(val) {
-            console.log(val)
-            this.dialogFormVisible = true
-        },
-        // 点击确定修改
-        modifyPwd() {
-
+        addData(data) {
+            this.getAllBrands()
         },
         del(id) {
-            console.log(id)
+            let params = JSON.stringify([String(id)])
+            this.post('useradmin/brand_delete/', {id:params}).then((res) => {
+                if(res.code == '2008') {
+                    this.$message({
+                        message: res.data,
+                        type: 'success'
+                    })
+                    this.getAllBrands()
+                } else {
+                    this.$message({
+                        message: res.data,
+                        type: 'warning'
+                    });
+                }
+            })
         }
     }
 }
@@ -162,5 +181,5 @@ export default {
     max-width 300px
     overflow auto
 .el-table
-    width 1151px
+    width 1200px
 </style>

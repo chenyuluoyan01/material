@@ -44,7 +44,7 @@ export default {
             isRequired: true,
             typeList: [],
             styleList: [],
-            styleName:'',
+            styleParentName:'',
             parentList: [],
             category:[],
             type_class:'', // 传给后台的type_class
@@ -76,15 +76,14 @@ export default {
                         return item.id == this.ruleForm.parent_type_id
                     })
                     this.ruleForm.parentClass = label.type_name
-                    this.styleName = this.ruleForm.type_name
+                    let styleName = this.ruleForm.type_name
                     this.styleList = this.parentList
                     this.styleList.sort(this.compare('type_class'))
                     this.styleList.pop()
-                    
                     this.styleList.map((item, index) => {
                         this.category.push(item.type_name)
                     })
-                    this.category.push(this.styleName)
+                    this.category.push(styleName)
                 }
             },
             immediate: true
@@ -129,7 +128,7 @@ export default {
             } else {
                 this.styleList = []
                 this.isRequired = false
-                this.styleName = ''
+                this.styleParentName = ''
                 // 没有父类
                 this.parentList = []
                 this.parent_id = ''
@@ -159,11 +158,8 @@ export default {
                 //筛选出匹配数据，是对应数据的整个对象
             });
             this.parent_id = val
-            this.styleName = label.type_name
+            this.styleParentName = label.type_name
             this.type_class = label.type_class
-            // console.log(label.type_class)
-            // console.log('styleName')
-            // console.log(this.styleName)
             let proms = {
                 type_id: val
             }
@@ -171,8 +167,6 @@ export default {
                 if(res.code == 0) {
                     if(res.data.parent_type_info) {
                         this.parentList = res.data.parent_type_info
-                        // console.log("parentList")
-                        // console.log(this.parentList)
                         if(this.parentList.length > 1) {
                             this.parentList.sort(this.compare('type_class'))
                             // this.parentList.pop()
@@ -194,7 +188,11 @@ export default {
                         category.push(item.type_name)
                     })
                 }
-                category.push(this.styleName)
+                if(this.styleParentName == '') {
+                    return false
+                } else {
+                    category.push(this.styleParentName)
+                }
                 category.push(this.ruleForm.type_name)
                 this.category = category
             } else if(!this.isRequired && this.ruleForm.type_class && this.ruleForm.type_name) {

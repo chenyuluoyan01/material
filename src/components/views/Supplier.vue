@@ -15,6 +15,7 @@
                 <el-table-column
                     type="index"
                     label="编号"
+                    fixed
                     width="80">
                 </el-table-column>
                 <el-table-column
@@ -44,6 +45,7 @@
                 </el-table-column>
                 <el-table-column
                     label="经营状态"
+                    fixed="right"
                     width="100">
                     <template slot-scope="scope">
                         <el-tag type="success" v-if="scope.row.status==1" effect="dark">正常营业</el-tag>
@@ -52,11 +54,11 @@
                 </el-table-column>
                 <el-table-column
                     label="编辑"
+                    fixed="right"
                     width="120">
                     <template slot-scope="scope">
                         <span class="edit-icon icon1" @click="edit(scope.row)"><i class="iconfont iconxiugai"></i></span>
                         <el-popconfirm :title="'确定删除 '+scope.row.company+' 吗？'" @onConfirm="del(scope.row.id)">
-                            <!-- <el-button slot="reference">删除</el-button> -->
                             <span class="edit-icon icon0" slot="reference"><i class="iconfont iconshanchu"></i></span>
                         </el-popconfirm>
                         <!-- <span class="edit-icon icon0" @click="del(scope.row.id)"><i class="iconfont iconshanchu"></i></span> -->
@@ -66,7 +68,7 @@
             <div class="pages">
                 <el-pagination
                 background
-                layout="sizes, prev, pager, next"
+                layout="total,sizes, prev, pager, next, jumper"
                 @current-change="handleCurrentChange"
                 @size-change = "handleSizeChange"
                 :current-page="currentPage"
@@ -80,10 +82,6 @@
         <!-- 点击修改 -->
         <el-dialog title="修改供应商" :visible.sync="dialogFormVisible" :fullscreen="false" :append-to-body="true">
             <v-form :cellVal = 'cellVal' @showModel="showModel"></v-form>
-            <!-- <div slot="footer" class="dialog-footer">
-                <el-button @click="dialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="modifyPwd">确 定</el-button>
-            </div> -->
         </el-dialog>
 
 
@@ -112,9 +110,9 @@ export default {
     },
     methods: {
         tableRowClassName({row, rowIndex}) {
-            if (rowIndex === 1) {
+            if (rowIndex%4 === 1) {
                 return 'warning-row';
-            } else if (rowIndex === 3) {
+            } else if (rowIndex%4 === 3) {
                 return 'success-row';
             }
             return '';
@@ -141,17 +139,11 @@ export default {
             this.get('useradmin/add/supplier/', params).then((res) => {
                 if(res.code == '0') {
                     this.supplierData = res.data.datas
-                    this.total = res.data.pagination.pagenum
+                    this.total = parseInt(res.data.pagination.max_count)
                 }
             })
         },
         edit(val) {
-            // this.$set(this.cellVal, 'company', val.company)
-            // this.$set(this.cellVal, 'legal_person', val.legal_person)
-            // this.$set(this.cellVal, 'telephone', val.telephone)
-            // this.$set(this.cellVal, 'address', val.address)
-            // this.$set(this.cellVal, 'uscc', val.uscc)
-            // this.$set(this.cellVal, 'status', val.status)
             this.cellVal = JSON.stringify(val)
             this.dialogFormVisible = true
         },
@@ -183,12 +175,10 @@ export default {
 }
 </script>
 
-<style lang = "stylus">
-/* .el-table
-    .warning-row
-        background oldlace
-
+<style lang='stylus' scoped>
+.el-form
+    max-width 300px
+    overflow auto
 .el-table
-    .success-row
-        background #f0f9eb */
+    max-width 1300px
 </style>

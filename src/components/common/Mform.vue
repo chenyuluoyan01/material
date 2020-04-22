@@ -1,242 +1,191 @@
 <template>
     <div>
         <el-form :model="ruleForm" :rules="rules" ref="myForms" label-width="80px">
-            <el-form-item label="材料名称" prop="materialName">
-                <el-cascader :options="options" clearable></el-cascader>
+            <el-form-item label="材料名称" prop="material" class="input-class">
+                <el-cascader 
+                :props="props" 
+                clearable 
+                v-model="ruleForm.material" 
+                @change="changeData" 
+                placeholder="请选择材料名称" 
+                ref="myCascader">
+                </el-cascader>
             </el-form-item>
-            <el-form-item label="规格型号" prop="type">
-                <el-input v-model="ruleForm.type"></el-input>
+
+            <el-form-item label="规格型号" prop="specifications" class="input-class">
+                <el-input v-model="ruleForm.specifications"></el-input>
             </el-form-item>
-            <el-form-item label="单位" prop="unit">
+            <el-form-item label="单位" prop="unit" class="input-class">
                 <el-input v-model="ruleForm.unit"></el-input>
             </el-form-item>
-            <el-form-item label="其他说明" prop="desc">
-                <el-input type="textarea" v-model="ruleForm.desc"></el-input>
-            </el-form-item>
+            <!-- <el-form-item label="其他说明" prop="desc" class="input-class">
+                <el-input type="textarea" v-model="ruleForm.desc" :rows="4"></el-input>
+            </el-form-item> -->
             <el-form-item>
-                <el-button type="primary">提交</el-button>
+                <el-button v-if="isEdit" type="primary" @click="edit">确认修改</el-button>
+                <el-button v-else type="primary" @click="add">新增</el-button>
             </el-form-item>
         </el-form>
     </div>
 </template>
 
 <script>
+let id = 0;
 export default {
-    data() { 
+    props:['cellVal'],
+    data() {
+        let that = this
         return {
+            isEdit: false,
+            // allOptions: [{
+            //     value:1,
+            //     label: '一致'
+            // }],
              ruleForm: {
-                materialName: '',
-                type: '',
+                material: '',
+                specifications: '',
                 unit: '',
-                desc: ''
             },
-            category:['给牌书', '管材', '塑料管'],
             rules: {
-                materialName: [
+                material: [
                     { required: true, message: '请选择材料名称', trigger: 'change' }
                 ],
-                type: [
+                specifications: [
                     { required: true, message: '请填写材料型号', trigger: 'blur' }
                 ],
                 unit: [
                     { required: true, message: '请填写材料单位', trigger: 'change' }
                 ],
             },
-            options: [{
-                value: 'zhinan',
-                label: '指南',
-                children: [{
-                    value: 'shejiyuanze',
-                    label: '设计原则',
-                    children: [{
-                    value: 'yizhi',
-                    label: '一致'
-                    }, {
-                    value: 'fankui',
-                    label: '反馈'
-                    }, {
-                    value: 'xiaolv',
-                    label: '效率'
-                    }, {
-                    value: 'kekong',
-                    label: '可控'
-                    }]
-                }, {
-                    value: 'daohang',
-                    label: '导航',
-                    children: [{
-                    value: 'cexiangdaohang',
-                    label: '侧向导航'
-                    }, {
-                    value: 'dingbudaohang',
-                    label: '顶部导航'
-                    }]
-                }]
-                }, {
-                value: 'zujian',
-                label: '组件',
-                children: [{
-                    value: 'basic',
-                    label: 'Basic',
-                    children: [{
-                    value: 'layout',
-                    label: 'Layout 布局'
-                    }, {
-                    value: 'color',
-                    label: 'Color 色彩'
-                    }, {
-                    value: 'typography',
-                    label: 'Typography 字体'
-                    }, {
-                    value: 'icon',
-                    label: 'Icon 图标'
-                    }, {
-                    value: 'button',
-                    label: 'Button 按钮'
-                    }]
-                }, {
-                    value: 'form',
-                    label: 'Form',
-                    children: [{
-                    value: 'radio',
-                    label: 'Radio 单选框'
-                    }, {
-                    value: 'checkbox',
-                    label: 'Checkbox 多选框'
-                    }, {
-                    value: 'input',
-                    label: 'Input 输入框'
-                    }, {
-                    value: 'input-number',
-                    label: 'InputNumber 计数器'
-                    }, {
-                    value: 'select',
-                    label: 'Select 选择器'
-                    }, {
-                    value: 'cascader',
-                    label: 'Cascader 级联选择器'
-                    }, {
-                    value: 'switch',
-                    label: 'Switch 开关'
-                    }, {
-                    value: 'slider',
-                    label: 'Slider 滑块'
-                    }, {
-                    value: 'time-picker',
-                    label: 'TimePicker 时间选择器'
-                    }, {
-                    value: 'date-picker',
-                    label: 'DatePicker 日期选择器'
-                    }, {
-                    value: 'datetime-picker',
-                    label: 'DateTimePicker 日期时间选择器'
-                    }, {
-                    value: 'upload',
-                    label: 'Upload 上传'
-                    }, {
-                    value: 'rate',
-                    label: 'Rate 评分'
-                    }, {
-                    value: 'form',
-                    label: 'Form 表单'
-                    }]
-                }, {
-                    value: 'data',
-                    label: 'Data',
-                    children: [{
-                    value: 'table',
-                    label: 'Table 表格'
-                    }, {
-                    value: 'tag',
-                    label: 'Tag 标签'
-                    }, {
-                    value: 'progress',
-                    label: 'Progress 进度条'
-                    }, {
-                    value: 'tree',
-                    label: 'Tree 树形控件'
-                    }, {
-                    value: 'pagination',
-                    label: 'Pagination 分页'
-                    }, {
-                    value: 'badge',
-                    label: 'Badge 标记'
-                    }]
-                }, {
-                    value: 'notice',
-                    label: 'Notice',
-                    children: [{
-                    value: 'alert',
-                    label: 'Alert 警告'
-                    }, {
-                    value: 'loading',
-                    label: 'Loading 加载'
-                    }, {
-                    value: 'message',
-                    label: 'Message 消息提示'
-                    }, {
-                    value: 'message-box',
-                    label: 'MessageBox 弹框'
-                    }, {
-                    value: 'notification',
-                    label: 'Notification 通知'
-                    }]
-                }, {
-                    value: 'navigation',
-                    label: 'Navigation',
-                    children: [{
-                    value: 'menu',
-                    label: 'NavMenu 导航菜单'
-                    }, {
-                    value: 'tabs',
-                    label: 'Tabs 标签页'
-                    }, {
-                    value: 'breadcrumb',
-                    label: 'Breadcrumb 面包屑'
-                    }, {
-                    value: 'dropdown',
-                    label: 'Dropdown 下拉菜单'
-                    }, {
-                    value: 'steps',
-                    label: 'Steps 步骤条'
-                    }]
-                }, {
-                    value: 'others',
-                    label: 'Others',
-                    children: [{
-                    value: 'dialog',
-                    label: 'Dialog 对话框'
-                    }, {
-                    value: 'tooltip',
-                    label: 'Tooltip 文字提示'
-                    }, {
-                    value: 'popover',
-                    label: 'Popover 弹出框'
-                    }, {
-                    value: 'card',
-                    label: 'Card 卡片'
-                    }, {
-                    value: 'carousel',
-                    label: 'Carousel 走马灯'
-                    }, {
-                    value: 'collapse',
-                    label: 'Collapse 折叠面板'
-                    }]
-                }]
-                }, {
-                value: 'ziyuan',
-                label: '资源',
-                children: [{
-                    value: 'axure',
-                    label: 'Axure Components'
-                }, {
-                    value: 'sketch',
-                    label: 'Sketch Templates'
-                }, {
-                    value: 'jiaohu',
-                    label: '组件交互文档'
-                }]
-            }]
+            props: {
+                checkStrictly : true,
+                lazy:true,
+                lazyLoad(node,resolve){
+                    that.initData(node,resolve)
+                }
+            },
+            material:''
+        }
+    },
+    watch:{
+        cellVal:{
+            handler(newVal, oldVal) {
+                if(newVal == undefined) {
+                    return false
+                } else {
+                    this.isEdit = true
+                    this.ruleForm = JSON.parse(newVal)
+                }
+            },
+            immediate: true
+        }
+    },
+    methods: {
+        initData(node,resolve) {
+            setTimeout(() => {
+                if (node.level == 0) {
+                    this.get('useradmin/search/type/',{type_class: '1'}).then((res) => {
+                        let newData = res.data
+                        newData.forEach(function(value, index) {
+                            value.label = value.type_name
+                            value.value = value.id
+                            value.leaf = node.level >= 2
+                            delete value.parent_type_id
+                            delete value.update_time
+                            delete value.create_time
+                            delete value.is_delete
+                            delete value.id
+                            delete value.type_name
+                        })
+                        resolve(newData)
+                    })
+                } else if(node.level == 1) {
+                    this.get('useradmin/search/type/id/',{type_id: node.value}).then((res) => {
+                        let newData = res.data.children
+                        newData.forEach(function(value, index) {
+                            value.label = value.type_name
+                            value.value = value.id
+                            value.leaf = node.level >= 2
+                        })
+                        resolve(newData)
+                    })
+                } else if(node.level == 2) {
+                    this.get('useradmin/search/type/id/',{type_id: node.value}).then((res) => {
+                        let newData = res.data.children
+                        newData.forEach(function(value, index) {
+                            value.label = value.type_name
+                            value.value = value.id
+                            value.leaf = node.level >= 2
+                        })
+                        resolve(newData)
+                    })
+                }
+            }, 100)
+        },
+        changeData(id) {
+            if(id == undefined) {
+                return false
+            } else {
+                this.material_type = id.slice(-1)[0]
+                this.material_type = id.slice(-1)[0] // 材料输入框中最后一个id
+                this.material = this.$refs.myCascader.getCheckedNodes()[0].label
+            }
+        },
+        edit() {
+            this.funC('useradmin/norms_update/')
+        },
+        add() {
+            this.funC('useradmin/norms_add/')
+        },
+        funC(url) {
+            this.$refs.myForms.validate((valid) => {
+                if(valid) {
+                    let parmas = []
+                    let _parmas = null
+                    if(this.isEdit) {
+                        parmas = [{
+                            specifications: this.ruleForm.specifications, // 规格
+                            id: this.ruleForm.id,
+                            material_type_id: this.material_type, // 选择材料分类的id
+                            unit: this.ruleForm.unit
+                        }]
+                        _parmas = {material:JSON.stringify(parmas)}
+                    } else {
+                        parmas = [{
+                            material_type: this.material_type, // 材料id
+                            material: this.material, // 材料名称
+                            unit: this.ruleForm.unit, // 单位
+                            specifications: this.ruleForm.specifications // 规格
+                        }]
+                        _parmas = {material_key:this.material_type, material:JSON.stringify(parmas)}
+                    }
+                    this.post(url, _parmas).then((res) => {
+                        if(res.code == '2008') {
+                            if(this.isEdit) {
+                                this.$message({
+                                    message: res.data,
+                                    type: 'success'
+                                });
+                                this.$emit('showModel',false)
+
+                            } else {
+                                this.$message({
+                                    message: res.data,
+                                    type: 'success'
+                                });
+                                this.$emit('addData',false)
+                            }
+                        } else if(res.code != '2008'){
+                            this.$message({
+                                message: res.data,
+                                type: 'warning'
+                            });
+                        }
+                        // this.ruleForm.specifications = ''
+                        // this.ruleForm.unit = ''
+                    })
+                }
+            })
         }
     }
 }
@@ -244,9 +193,10 @@ export default {
 
 <style lang='stylus' scoped>
 .el-form
-    max-width 300px
     overflow auto
-.el-cascader-panel {
-    height: 300px;
-}
+.el-cascader-panel
+    height 300px
+.input-class
+    .el-input,.el-cascader,.el-textarea
+        width 300px
 </style>

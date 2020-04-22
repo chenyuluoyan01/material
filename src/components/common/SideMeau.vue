@@ -36,15 +36,24 @@ export default {
                 title: '分类管理',
                 path: '/Classify',
             },{
+                title: '物资管理',
+                path: '/Material',
+            },{
                 title: '品牌管理',
                 path: '/Brand',
-            },{
-                title: '物资管理',
-                path: 'Material',
             },{
                 title: '供应商管理',
                 path: '/Supplier',
             }],
+        }
+    },
+    watch: { // 路由监听：监听路由的变化，从而做出相应操作
+        $route: {
+            immediate: true, // 一旦监听到路由的变化立即执行
+            handler(to,from) {
+                this.activeMenu = to.path // 给activeMenu重新赋值为当前组件的路由地址           
+            },
+            deep: true,
         }
     },
     methods: {

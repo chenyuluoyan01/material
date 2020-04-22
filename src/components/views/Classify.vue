@@ -11,10 +11,11 @@
             <div slot="header" style="margin:-18px -20px; padding:18px 20px; background: #1296db;color:#fff">
                 <span>分类详情</span>
             </div>
-            <el-table :data="classifyData" highlight-current-row border :row-class-name="tableRowClassName" :header-cell-style="headClass">
+            <el-table :data="classifyData" border :row-class-name="tableRowClassName" :header-cell-style="headClass">
                 <el-table-column
                     type="index"
                     label="编号"
+                    fixed
                     width="80">
                 </el-table-column>
                 <el-table-column
@@ -39,10 +40,13 @@
                 </el-table-column>
                 <el-table-column
                     label="编辑"
+                    fixed="right"
                     width="120">
                     <template slot-scope="scope">
                         <span class="edit-icon icon1" @click="edit(scope.row)"><i class="iconfont iconxiugai"></i></span>
-                        <span class="edit-icon icon0" @click="del(scope.row.id)"><i class="iconfont iconshanchu"></i></span>
+                        <el-popconfirm :title="'确定删除吗？'" @onConfirm="del(scope.row.id)">
+                            <span class="edit-icon icon0" slot="reference"><i class="iconfont iconshanchu"></i></span>
+                        </el-popconfirm>
                     </template>
                 </el-table-column>
             </el-table>
@@ -55,7 +59,7 @@
                 :current-page="currentPage"
                 :page-sizes="[1, 20, 30, 50]"
                 :page-size="pageSize"
-                :total="totals">
+                :total="total">
                 </el-pagination>
             </div>
         </el-card>
@@ -82,14 +86,15 @@ export default {
             dialogFormVisible: false,
             currentPage: 1,
             pageSize: 20,
-            totals: 0,
+            total: 0,
+            vals: 0,
             classifyData: [],
             cellVal:{}
         }
     },
     watch: {
-        totals(val,oldVal) {
-            
+        total(val,oldVal) {
+            this.vals = val
             console.log(val)
             console.log(oldVal)
         }
@@ -99,9 +104,9 @@ export default {
     },
     methods: {
         tableRowClassName({row, rowIndex}) {
-            if (rowIndex%4 === 0) {
+            if (rowIndex%4 === 1) {
                 return 'warning-row';
-            } else if (rowIndex%4 === 2) {
+            } else if (rowIndex%4 === 3) {
                 return 'success-row';
             }
             return '';
@@ -127,14 +132,13 @@ export default {
                 page_size: String(this.pageSize)
             }
             this.get('useradmin/showall/type/', params).then((res) => {
-                if(res.code == '0') {
+                if(res.code == 0) {
                     this.classifyData = res.data.material
                     this.classifyData.map((item, index, arr) => {
                         item.parent.sort(this.compare('type_class'))
                     })
-
-                    this.totals = parseInt(res.data.pagination.pagenum)
-                    console.log(this.totals)
+                    console.log(this.classifyData)
+                    this.total = parseInt(res.data.pagination.max_count)
                 }
             })
         },
@@ -192,5 +196,5 @@ export default {
     max-width 300px
     overflow auto
 .el-table
-    width 1151px
+    width 1000px
 </style>
